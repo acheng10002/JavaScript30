@@ -6,7 +6,7 @@
   <link rel="icon" href="https://fav.farm/🔥" />
 </head>
 <body class="bod">
-
+  <!-- three divs -->
   <div class="one">
     <div class="two">
       <div class="three">
@@ -43,7 +43,56 @@
 
 <button></button>
 <script>
+  // listen for a click on all 3 divs
+  const divs = document.querySelectorAll('div'); // select all 3 divs
 
+  const button = document.querySelector('button');
+
+  function logText(e) {
+    
+    console.log(this.classList.value); // when someone clicks the div, I'm going to log it and see the classes three, two, and one
+    // versus just console.log(this); I'll see the elements, three, two, and one
+    // BUBBLING - browser will figure out what I clicked on but it triggers clicks up the the DOM tree and all those other elements
+    // e.stopPropagation(); // takes my event in my function and stops bubbling the click event up
+
+    // with above, browser starts at the lowest element
+    // browser runs logText on the lowest element, and then
+    // it's told to stop bubbling, and it will no longer trigger events on the parents
+  }
+
+  // document.body.addEventListener('click', logText);
+
+  // take all the divs, loop over each one, listen for click event, and when click event happens run logText
+  divs.forEach(div => div.addEventListener('click', logText, {
+    
+    // capture: true // this means logText won't get run on the bubble up, and instead it gets run on the capture down
+    // capture: true means the function will be run on the way down the DOM tree from that element
+
+    // by default, it's capture: false
+    capture: false,
+    once: true // ONCE - option that lets me having the browser listen for a click and then "unbind" itself (i.e. 
+    // div.removeEventListener('click', logText)) 
+    // browser will listen for a click once and then unbinds itself so there are no future clicks on it
+
+  })); // passing in a third argument which are options
+
+  // if I ran stopPropagation and capture were true, and I clicked on div three, capture will make it go from bod to one, 
+  // and stops at one, keeping capture from going down from one even further
+
+
+  // if I am listening for a click on an element that's been nested multiple times, then it'll trigger multiple clicks
+  // browser first does a capture
+  // CAPTURE - when I click on the element, the click ripples down; figures out what I'm clicked
+  // then the browser captures all those events, starts at the bottom most node in the DOM, and starts to do a bubble
+  // bubbling is when the browser starts firing off click events up the DOM tree
+
+  button.addEventListener('click', () => {
+    console.log('Click!!!');
+  }, {
+    once: true // if I only want the person to click the button once
+    // this gets used in store checkouts where I don't want users to click a button more than once
+  }); 
+  
 </script>
 </body>
 </html>

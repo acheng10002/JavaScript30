@@ -1,3 +1,5 @@
+<!-- CSS variables can be updated with JS -->
+<!-- update a variable in CSS, everywhere on the page where that variable is referenced updates itself -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,26 +8,52 @@
   <link rel="icon" href="https://fav.farm/🔥" />
 </head>
 <body>
+  <!-- h2 has a span with a class of highlighter, hl -->
   <h2>Update CSS Variables with <span class='hl'>JS</span></h2>
 
   <div class="controls">
     <label for="spacing">Spacing:</label>
+    <!-- data attribute's been created (it's an attribute that I make up), and I put on a suffix value called px -->
     <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px">
 
     <label for="blur">Blur:</label>
     <input id="blur" type="range" name="blur" min="0" max="25" value="10" data-sizing="px">
 
     <label for="base">Base Color</label>
+    <!-- base input does not ahve a data attribute -->
     <input id="base" type="color" name="base" value="#ffc600">
   </div>
 
   <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
 
   <style>
-
     /*
       misc styles, nothing to do with CSS variables
     */
+    /* CSS variables need to be declared on elements */
+    /* I declare them on root which is the highest level I can declare them on */
+    :root {
+
+      /* defines the CSS variables */
+      --base: #ffc600;
+      --spacing: 10px;
+      --blur: 10px; 
+
+    }
+
+    img {
+
+      /* var() to use a variable in CSS */
+      padding: var(--spacing);
+      background: var(--base);
+      filter: blur(var(--blur));
+    }
+
+    /* the JS */
+    /* again, anywhere I reference the variable it gets used */
+    .hl {
+      color: var(--base);
+    }
 
     body {
       text-align: center;
@@ -46,6 +74,36 @@
   </style>
 
   <script>
+    // first thing, need to select the three inputs so that when they change, I can update the CSS variables and in turn update
+    // the colors on the screen
+    const inputs = document.querySelectorAll('.controls input');
+
+    // querySelectorAll gives me a nodelist
+    // an array has all kinds of methods for dealing with an array like map, reduce, etc.
+    // a nodelist only has a few methods, entries(), forEach(), item(), keys(), values()
+
+    function handleUpdate() {
+      // dataset is an object that will contain all the data attributes from that 
+      // specific element 
+      // dataset takes everything that has data- from the element amd puts it in a tidy object
+      const suffix = this.dataset.sizing || ''; 
+      // console.log(suffix);
+
+      // set the property of the variable name and set it to this.value
+      document.documentElement.style.setProperty(`--${this.name}`, this.value + suffix);
+    }
+
+    // listen for a change event on each of the inputs
+    inputs.forEach(input => input.addEventListener('change', handleUpdate));
+  
+    // since it wasn't listening when I dragged the mouse around, without letting go,
+    // listen for the mousemove update too
+    inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
+  
+    // when I use a CSS variable, I can update that variable on any element in any
+    // selectors that are inside of that element, that reference that variable will
+    // use the CSS variable
+    // CSS variables could be scoped onto specific elements, like a div
   </script>
 
 </body>
