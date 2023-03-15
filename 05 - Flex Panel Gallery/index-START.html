@@ -1,3 +1,4 @@
+<!-- relies heavily on CSS for flexbox, transitions, and some events that CSS is going to admit to me -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +28,8 @@
     .panels {
       min-height: 100vh;
       overflow: hidden;
+      /* gets panels to display side to side instead of top to bottom */
+      display: flex;
     }
 
     .panel {
@@ -44,6 +47,17 @@
       font-size: 20px;
       background-size: cover;
       background-position: center;
+      /* tells the flex times of the container to share the remaining space */
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+
+      /* centers the content horizontally */
+      justify-content: center;
+
+      /* centers the content vertically */
+      align-items: center;
     }
 
     .panel1 { background-image:url(https://source.unsplash.com/gYl-UtwNg_I/1500x1500); }
@@ -57,7 +71,21 @@
       margin: 0;
       width: 100%;
       transition: transform 0.5s;
+      flex: 1 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
+    /* this hides each of the panel's first child */
+    .panel > *:first-child {transform: translateY(-100%);}
+
+    .panel.open-active > *:first-child {transform: translateY(0);}
+
+    /* hides each of the panel's last child  */
+    .panel > *:last-child {transform: translateY(100%);}
+
+    .panel.open-active > *:last-child {transform: translateY(0);}
 
     .panel p {
       text-transform: uppercase;
@@ -71,12 +99,12 @@
     }
 
     .panel.open {
+      /* when the panel has a class of open, it will take 5 times more space than the other panels */
+      flex: 5;
       font-size: 40px;
     }
 
   </style>
-
-
   <div class="panels">
     <div class="panel panel1">
       <p>Hey</p>
@@ -106,6 +134,32 @@
   </div>
 
   <script>
+    // JS here should just add and remove classes when I click the panels
+    // below gives me a nodelist of the different panels
+    const panels = document.querySelectorAll('.panel');  
+    
+    // function that toggles the open class
+    function toggleOpen() {
+      this.classList.toggle('open');
+    }
+
+    function toggleActive(e) {
+      // console.log(e.propertyName);
+      if (e.propertyName.includes('flex')) {
+        this.classList.toggle('open-active');
+      }
+    }
+
+    // take the panels, loop over each one, listen for a click, then run toggleOpen if click happens
+    // toggleOpen triggers a CSS open
+    // toggleOpen() would run on page load
+    panels.forEach(panel => panel.addEventListener('click', toggleOpen));
+
+    // listen for transitionend event
+    // when CSS open finishes, the second event listener will fire, then going to toggle open-active 
+    panels.forEach(panel => panel.addEventListener('transitionend', toggleActive));
+
+    // no need to specify width!
 
   </script>
 

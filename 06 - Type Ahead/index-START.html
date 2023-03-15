@@ -1,3 +1,8 @@
+<!-- type of head feature -->
+<!-- have a list of city or states with their populations, when I type in "new", browser shows me everything that matches "new" -->
+<!-- along with the corresponging population -->
+<!-- first I need to fetch the data, which is a huge array -->
+<!-- once the data is back, when a user types into the box, filter the array down to a subset -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,8 +21,84 @@
     </ul>
   </form>
 <script>
+// url that has cities json file that includes city name, state name, and population
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
 
+// first need an empty array to put cities into
+const cities = [];
+
+// HTML or XML http request in the browser could use jquery $.getjson or a library like Axios
+// browser has a new API built in
+// fetch returns a promise
+// promise is a way of saying something will eventually come back
+// const promise = fetch(endpoint);
+// console.log(promise);
+// then returns to me a blob of data
+// fetch(endpoint).then(blob => console.log(blob));
+
+// data that comes back from my fetch, it doesn't know what kind of data it is just yet
+// the data could be an image, it could be html, could be music, etc.
+// .json is a method of blob, and it will return another promise
+fetch(endpoint)
+  .then(blob => blob.json())
+
+  // I will then get the raw data
+  // this gives me a massive array with all 1000 cities, states, latitude, longitude
+  // spread into the empty array to fill it with the items from data
+  .then(data => cities.push(...data))
+
+  // need to run a function that takes the massive array and filters it down to a subset where I can then listen for it
+  function findMatches(wordToMatch, cities) {
+    return cities.filter(place => {
+
+      // g is global, i is insensitive to case
+      const regex = new RegExp(wordToMatch, 'gi');
+      // need to put a variable into a regex
+      return place.city.match(regex) || place.state.match(regex)
+    });
+  }
+
+  // puts commas in the population numbers
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+
+  // need to create my display function
+  // this will be called whenever someone changes the value in the box
+  // whenever something is typed into the box, displayMatches should be run
+  // findMatches should be called, and return places that match it
+  function displayMatches() {
+    // console.log(this.value);
+    const matchArray = findMatches(this.value, cities);
+    // console.log(matchArray);
+
+    // first have to loop over the matchArray
+    // map will return an array
+    const html = matchArray.map(place => {
+      
+      // create a regex that matches the city name and then use the regex to replace the word that it matches with a span of class hl
+      const regex = new RegExp(this.value, 'gi');
+      const cityName = place.city.replace(regex, `<span class="hl">${this.value}</span>`);
+      const stateName = place.state.replace(regex, `<span class="hl">${this.value}</span>`);
+      return `
+      <li>
+        <span class="name">${cityName}, ${stateName}</span>
+        <span class="population">${numberWithCommas(place.population)}</span>
+      </li>
+      `; 
+    // join turns the array with multiple items into one big string
+    }).join('');
+    suggestions.innerHTML = html;
+  }
+
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+
+  // change event only fires when I go off the input
+  searchInput.addEventListener('change', displayMatches);
+
+  searchInput.addEventListener('keyup', displayMatches);
 </script>
 </body>
 </html>
