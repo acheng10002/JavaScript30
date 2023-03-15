@@ -1,3 +1,5 @@
+
+<!-- fundamentals of canvas plus neat tricks --> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,8 +8,116 @@
   <link rel="icon" href="https://fav.farm/🔥" />
 </head>
 <body>
+<!-- this is the default size of canvas -->
 <canvas id="draw" width="800" height="800"></canvas>
 <script>
+// canvas on the web is like Microsoft Paint, where I just get a block of actual pixels and then I need to draw on them
+const canvas = document.querySelector('#draw');
+
+// I don't draw on the canvas element in HTML; I draw on the context which can be 2d or 3d
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// need to do base settings for stroke style, line cap, line join
+// stroke style is color
+ctx.strokeStyle = '#BADA55';
+
+// options for lineJoin and lineCap are on MDN
+// lineJoin is how the line end should look when it meets another line
+ctx.lineJoin = 'round';
+
+// lineCap is how the line end/cap should like
+ctx.lineCap = 'round';
+
+ctx.lineWidth = 10;
+
+// global composite operator (which is similar to Photoshop blend modes)
+// can play with different blend modes
+ctx.globalCompositeOperation = 'multiply';
+
+// drawing only happens when my cursor is down
+// when I click down, isDrawing will be true
+// when I click up, my cursor is up, isDrawing will be false
+// isDrawing will be my flag to tell me, should the browser draw on the canvas or is someone just moving their mouse over it
+// this flag is common in JS, and I want to test if it's true or not
+let isDrawing = false;
+
+// below gives the line a start (x, y) when I start and where the line will end when I stop
+let lastX = 0;
+let lastY = 0;
+
+let hue = 0;
+
+// when it hits maximum draw, it fades itself back
+// below means it is building up
+let direction = true;
+
+// draw function is called whenever I move my mouse on top of the canvas
+// I only want draw to run when the user has clicked down
+// when I move the mouse, use the event information to draw onto canvas context
+function draw(e) {
+  if (!isDrawing) return; // stop the function from running when they are not moused down
+  console.log(e); // this runs when the user's is moused down
+  // above is the click and drag functionality
+
+  ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+
+  // ctx is where all drawing is done for my canvas
+  // need to start with an x and a y
+  ctx.beginPath();
+
+  // start from
+  ctx.moveTo(lastX, lastY);
+
+  // ofsetX and ofsetY values are coming from the event that fired
+  // go to
+  ctx.lineTo(e.offsetX, e.offsetY);
+
+  // lines above start up my line, but not going to see my line until the code below
+  ctx.stroke();
+
+  // lastX = e.offsetX;
+  // lastY = e.offsetY;
+  [lastX, lastY] = [e.offsetX, e.offsetY]; // destructuring an array
+
+  // increment the hue
+  hue++;
+  if (hue >= 360) {
+    hue = 0;
+  }
+  // once lineWidth hits 100, go in reverse direction
+  // or is lineWidth is less than 1, also go in reverse direction
+  if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+    direction = !direction;
+  }
+  // depending on what the direction is, either increment or decrement
+  if (direction) {
+    ctx.lineWidth++;
+  } else {
+    ctx.lineWidth--;
+  } 
+}
+// as soon as the user clicks down on their mouse to start,
+canvas.addEventListener('mousedown', (e) => {
+  isDrawing = true;
+
+  // before I do a mousemove, when I do a mouse down, update the lastX and lastY
+  // this puts me where I want to go instead of start at (0,0)
+  [lastX, lastY] = [e.offsetX, e.offsetY]
+});
+
+// when I move my mouse on the canvas, e will be console logged
+// I can see in the mouseEvent, info about the event firing
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', () => isDrawing = false);
+canvas.addEventListener('mouseout', () => isDrawing = false);
+
+// HSL is the rainbow, but I can programmatically select pieces of the rainbow
+// hue: goes from red to red; saturation: brightness; lightness: how black or white
+// for every 360 draws, I can pick an increment of color and then
+
 </script>
 
 <style>

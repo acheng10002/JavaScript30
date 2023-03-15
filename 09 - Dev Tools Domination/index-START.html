@@ -12,6 +12,8 @@
   <script>
     const dogs = [{ name: 'Snickers', age: 2 }, { name: 'hugo', age: 8 }];
 
+    // inspect element > break on > attribute modification > click on element > shows me in Sources tab 
+    // the line of code causing the attribute > take off to get back to Elements
     function makeGreen() {
       const p = document.querySelector('p');
       p.style.color = '#BADA55';
@@ -19,28 +21,91 @@
     }
 
     // Regular
+    console.log('hello');
+
 
     // Interpolated
+    // will interpolate what is passed in as a second argument
+    console.log('Hello I am a %s string!', 'happy');
+    // console.log(`Hello I am a ${var} string!`);
+    
 
     // Styled
+    // %c first, and then the second argument will be interpolated
+    // console.log('%c I am some great text', 'font-size: 30px; background: yellow; text-shadow: 3px 3px blue');
+
 
     // warning!
+    // gives me a warning, and a stack trace as to where it got called
+    console.warn('OH NOOOO');
+
 
     // Error :|
+    // displays an error in the console and a stack trace as to where it got called
+    console.error('Crap');
+
 
     // Info
+    // displays the i for info
+    console.info('Crocodiles eat 3-4 people per year');
+
 
     // Testing
+    // if something is false, the second argument error will be displayed
+    // if it is true, no error will be displayed
+    // to test if things are true
+    const p = document.querySelector('p');
+    
+    // if the classList does not contain ouch, tells me that is wrong
+    console.assert(p.classList.contains('ouch'), 'That is wrong');
+
+    // it'll only fire if something is not true; second argument is what appears in the console
+    console.assert(1 === 2, 'That is wrong!');
+
 
     // clearing
+    console.clear();
+
 
     // Viewing DOM Elements
+    console.log(p);
+    // allows to see all the methods and properties that lives on the element, style, the classList, the data set, the children
+    console.dir(p);
+
 
     // Grouping together
+    // loop over each item in the dogs array
+    dogs.forEach(dog => {
+      // or console.group(`${dog.name}`);
+      console.groupCollapsed(`${dog.name}`);
+      console.log(`This is ${dog.name}`);
+      console.log(`${dog.name} is ${dog.age} years old`);
+      console.log(`${dog.name} is ${dog.age * 7} dog years old`);
+      console.groupEnd(`${dog.name}`);
+    });
+
 
     // counting
+    // counts how many times I use a specific word or number or object
+    // log them in real tiem telling me how many I've counted at that time
+    console.count('Wes');
+    console.count('Wes');
+    console.count('Steve');
+    console.count('Steve');
+    console.count('Wes');
+    console.count('Wes');
+
 
     // timing
+    // browser also has performance now to do this
+    // to see how long something takes
+    console.time('fetching data');
+    fetch('https://api.github.com/users/wesbos')
+      .then(data => data.json())
+      .then(data => {
+        console.timeEnd('fetching data');
+        console.log(data);
+      });
 
   </script>
 </body>
