@@ -1,3 +1,8 @@
+<!-- mouse- cursor-movement make shadow follow me around -->
+<!-- this can be done on a phone where it's been tapped into the accelerometer -->
+<!-- depending on how far a phone is tipping, the shadow will also follow -->
+<!-- when I'm dealing with events, I can use offsetX and offsetY to get the position of where my cursor is -->
+<!-- if I have nested elements, I will need to do a little math -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +35,66 @@
   }
 
   h1 {
+    /* style of this h1 tag will be dynamically updated */
     text-shadow: 10px 10px 0 rgba(0,0,0,1);
     font-size: 100px;
   }
   </style>
 
 <script>
+  // need to listen for a mousemove event on the div with class hero
+  // and when that changes, I need to figure out where I should put the text shadow
+  const hero = document.querySelector('.hero');
+  const text = hero.querySelector('h1');
+  const walk = 100; // 100px
+
+  function shadow(e) {
+    // console.log(e);
+    // I get loads of information about what happened during the mouseover
+    // get width & height of hero which I've hovered over
+    // const width = hero.offsetWidth;
+    // const height = hero.offsetHeight;
+
+    // destructured
+    const { offsetWidth: width, offsetHeight: height} = hero;
+
+    // need to know where the user's cursor's was
+    let {offsetX: x, offsetY: y} = e;
+    
+    // console.log(x, y);
+
+    // even tho I'm listening for the mousemove on the hero, hero has children,
+    // so mousemove will give me the x and y of one child that I've hovered over
+    
+    // if I'm hovering over the h1, I need to modify the x and y, so there's consistency wherever the mousemove happens
+    // this is the thing I listened on, which is hero
+    // e.target is the thing I triggered on, which may be h1
+    if (this !== e.target) {
+      x = x + e.target.offsetLeft;
+      y = y + e.target.offsetTop;
+    }
+    // console.log(x, y);
+    // 50 is as positive as I can go, -50 is as negative as I can go
+    const xWalk = Math.round((x / width * walk) - (walk / 2));
+    const yWalk = Math.round((y / height * walk) - (walk / 2));
+
+    // console.log(xWalk, yWalk);
+
+    // textShadow - width, height, blur, color
+    text.style.textShadow = `
+      ${xWalk}px ${yWalk}px 0 rgba(255,0,255,0.7),
+      ${xWalk * -1}px ${yWalk}px 0 rgba(0,255,255,0.7),
+      ${yWalk}px ${xWalk * -1}px 0 rgba(0,255,0,0.7),
+      ${yWalk * -1}px ${xWalk}px 0 rgba(0,0,255,0.7)
+    `;
+  }
+
+  // how far should the text shadow actually go? I need a "walk"
+  // "walk" is how many pixels at its most should the text shadow be stretched
+  
+  // when there is a mousemove, shadow will be run
+  hero.addEventListener('mousemove', shadow);
+
 </script>
 </body>
 </html>

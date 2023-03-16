@@ -1,3 +1,7 @@
+<!-- local storage and event delegation -->
+<!-- add item, refresh page, the new item is still there- this is persisting my state with local storage -->
+<!-- ability to add item and then check it right away- this is event delegation -->
+<!--  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,10 +31,145 @@
   </div>
 
 <script>
+  // API - application programming interface; set of protocols, routines, and tools for building software applications;
+  // API defines how software components should interact with each other and allows devs to access data and functionality
+  // from other software services, applications, or platforms
+  // when the user submits the form above, I'm going to add item
   const addItems = document.querySelector('.add-items');
+  
+  // select the ul with class plates, where the tapas dishes will be loaded into
   const itemsList = document.querySelector('.plates');
-  const items = [];
 
+  // storing my data in an array, specifically an array of objects
+  // the array of objects has the name of the array, status as checked or unchecked
+  // it will try to get items form local storage or make it an empty array 
+  const items = JSON.parse(localStorage.getItem('items')) || [];
+
+  // then on pageload, items is going to be populated
+
+  function addItem(e) {
+    // console.log('Hello');
+    // what happens when I submit the item, is my page refreshes
+    // by default, a form reloads, refreshes the page or sends the data to an external source
+    e.preventDefault();
+    // console.log('hello');
+
+    // grab the input box
+    // I can do this instead of document. because this is the actual form tag, and I'm looking inside the form tag for something
+    // with the name attribute of item; with this, I am narrowing down my search to this form instead of all forms on the page
+    // (since this function is being called in the event listener hooked up to the form)
+    // inputs have a property called value
+    const text = this.querySelector('[name=item]').value;
+
+    // then I need to take the text put into the box into an object
+    const item = {
+      // with es6, no need to type text = text, the shorthand is below
+      text,
+      done: false   // by default, it won't be checked
+    };
+    // console.log(item);
+    // again, this is the form element
+    // form elements have a method called reset on them
+
+    // now I need to put the single item into the item array
+    items.push(item);
+
+    // every time I add an item, I call populateList which then creates a list item with a label inside
+    // every time I add an item, itemsList is recreated, for better performance, I may need to look into how to update the
+    // single added list rather than rerendering the itemsList
+    // REACT and Angular helps with that
+    populateList(items, itemsList);
+    // .setItem, .getItem, .removeItem are the APIs
+    // the key goes into the ()
+    // localStorage is actually just a key value store, and in local storage I can only use strings
+    // so the array needs to be converted to a string before I set it into localStorage
+    localStorage.setItem('items', JSON.stringify(items));
+    this.reset();
+
+    // in the console, I can run localStorage.getItem('items') to get the string
+    // and then I can put it in JSON.parse to turn the string into an array of objects
+
+    // up until this point, the data won't persist when I refresh 
+  }
+
+  // need a second function called populateList that's going to create the HTML here
+  // needs 2 things:
+  // 1. list of plates to populate, which will be stored in the items array
+  // 2. HTMl element place to put the the plates list or items list
+  // passing in an empty object means if I forget to pass in  a list, my JS won't break, it'll just loop over an array of nothing
+
+  // I don't want to just hardcode this, I want populateList to be resilient
+  function populateList(items = [], itemsList) {
+    itemsList.innerHTML = items.map((item, i) => {
+      // loop over every item in my items array/ the object, and map it
+      // map will take in an array of some data and return an array of some other data
+      // with map here, I'm going to take in an object and return a string from each one 
+      
+      // when I click on the label, input will check itself 
+      // I need to know if the items are checked or not, because if I rerender the list if an item is already checked,
+      // and it has a done status, I need to put the checked attribute
+      // if it has a done attribute, put in the checked attribute
+      // otherwise, leave out the checked attribute
+      return `
+      <li>
+        <input type="checkbox" data-index=${i} id="item${i}" ${item.done ? 'checked' : ''}/>
+        <label for="item${i}">${item.text}</label>
+      </li>
+      `;
+    // calling join here because map will return an array, but what I need is one big string to go into the HTML
+    }).join(''); 
+  }
+
+  // need function to make the toggle state persist
+  // when does toggleDone run? 
+  // listen for a click in the unordered list of plates, and then figure out, did the user actually mean to click
+  // one of the inputs inside the ul
+  function toggleDone(e) {
+     //I want to check to see if the target matches what I am looking for
+    if (!e.target.matches('input')) return; // skip this unless it's an input (so skip the clicking of the label)
+    // console.log(e.target); // it'll actually be two events, one click on the label and one click on the input checkbox
+
+    // EVENT DELEGATION: listen for a click on something higher, and then inside the event listener, I use a function to check
+    // if the something higher is what I want
+
+    // go to the items array, find the one that was checked, and set the done to be true
+    // so first get an index
+    const el = e.target;
+
+    // this is why a data-index was put on each of the checkboxes
+    // console.log(el.dataset.index);
+    const index = el.dataset.index;
+
+    // flip flopping the done property between done being true and false
+    items[index].done = !items[index].done;
+
+    // put it into local storage
+    localStorage.setItem('items', JSON.stringify(items));
+
+    // update the actual visibility
+    populateList(items, itemsList);
+  }
+
+  // inputs have been created after I listened for them, 
+  // so heard nothing, and no event listeners attached to them after they've been created
+  // EVENT DELEGATION - instead of listening for a click or change on things directly, look instead for somebody that will be
+  // on the page at the time of listening
+
+  // listening for a submit event because that is what I need- could be a click of the button, or hits enter, or when something
+  // external submits it and then run the function addItem
+  addItems.addEventListener('submit', addItem);
+
+  // adding an EventListener on something that does not exist, it won't be clicked in the future
+  // event delegation will fix this
+  itemsList.addEventListener('click', toggleDone);
+
+  // I have localStorage in my browser; I can see it if I go to localStorage in my console
+  // this is specific to the computer, browser, and website
+  // I can save text to the browser, and when I reload the page, I can get the text
+
+  populateList(items, itemsList);
+
+  // every time I make a change, it gets mirrored to localStorage and then rerender the entire list
 </script>
 
 

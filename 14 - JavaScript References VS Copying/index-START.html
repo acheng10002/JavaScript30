@@ -1,3 +1,4 @@
+<!-- reference vs copy becomes source of bugs when working with nested data -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,31 +10,67 @@
 
   <script>
     // start with strings, numbers and booleans
+    // let age = 100;
+    // let age1 = age;
+    // console.log(age, age1); // 100, 100
+    // age = 200;
+    // console.log(age, age1); // 200, 100
+
+    // let name = 'wes';
+    // let name1 = name;
+    // console.log(name, name1);
+    // name = 'wesley';
+    // console.log(name, name1);
+
+    // the values of the original variable go into the new variable
+    // if I change the value of the original variable, the new variable won't be updated
 
     // Let's say we have an array
     const players = ['Wes', 'Sarah', 'Ryan', 'Poppy'];
 
     // and we want to make a copy of it.
+    const team = players;
+    console.log(players, team); // same array twice
 
     // You might think we can just do something like this:
+    team[3] = 'Lux'; // team's element at index 3 has changed
 
     // however what happens when we update that array?
+    // player's element at index 3 has also changed!
 
     // now here is the problem!
+    // because I updated team... team is a reference to the original array, players (not a copy?)
 
     // oh no - we have edited the original array too!
-
     // Why? It's because that is an array reference, not an array copy. They both point to the same array!
+    // IF I UPDATE AN ARRAY, IT WILL ALWAYS REFERENCE BACK!!
 
     // So, how do we fix this? We take a copy instead!
 
     // one way
+    const team1 = players.slice()
+    // .slice(arg1, arg2) arg1 is the index to start at, and arg2 is the index to stop at?
+    // original array will be untouched
+    // when .slice is passed nothing, a copy of the array is made
+    team1[3] = 'Kai';
+    console.log(team1, players); // team1 has Kai in the array, but players is unchanged!
 
-    // or create a new array and concat the old one in
+    // or create a new blank array and concat the old one in
+    const team2 = [].concat(players);
+    console.log(team2, players);
 
     // or use the new ES6 Spread
+    // spread will take every item out of my iterable and put it into the new container array
+    // (spread can be used to spread into a function)
+    const team3 = [...players];
 
     // now when we update it, the original one isn't changed
+    team3[3] = 'Stef';
+    console.log(team3, players);
+
+    const team4 = Array.from(players);
+    team4[3] = 'Amy';
+    console.log(team4, players);
 
     // The same thing goes for objects, let's say we have a person object
 
@@ -45,12 +82,48 @@
 
     // and think we make a copy:
 
+    // const captain = person;
+    // captain.age = 99;
+
+    // this makes a reference instead
+
     // how do we take a copy instead?
+    // pass the function the object I want to copy all the properties from which is person
+    // and then fold in my new properties, overwrite the ones I want to overwrite
+    const captain1 = Object.assign({}, person, {age: 99});
+    console.log(captain1, person);
+    // I took a blank object (arg1), folded in all the properties and values from the original object (arg2).
+    // and fold in new properties (arg3)
 
     // We will hopefully soon see the object ...spread
+    const captain2 = {...person};
+    // this is similar to how react works; spreading into an object here
 
     // Things to note - this is only 1 level deep - both for Arrays and Objects. lodash has a cloneDeep method, but you should think twice before using it.
+    // REACT is a popular open-source JS library for building user interfaces; it based on the concept of reusable components
+    // Lodash is a popular JS library that provides utility functions for common programming tasks
+    // Lodash is a collection of functions designed to work well with functional programming patterns and provide an
+    // alternative to the built-in JS methods
 
+    const wes = {
+      name: 'Wes',
+      age: 100,
+      social: {
+        twitter: '@wesbos',
+        facebook: 'wesbos.developer'
+      }
+    };
+
+    console.clear();
+    console.log(wes);
+
+    // I can pass JSON.stringify an object, and the object is converted to a string
+    // then I JSON.parse it to turn the string back into an object, 
+    // and then I get a full copy of it
+    const dev2 = JSON.parse(JSON.stringify(wes)); 
+
+    // if I try to update properties two levels deeper, twitter or facebook, the original object will be changed!
+    // to do a clone, I need a function called cloneDeep to clone every level to as deep as a level I would like
   </script>
 
 </body>

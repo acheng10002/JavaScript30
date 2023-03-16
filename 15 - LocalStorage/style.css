@@ -58,15 +58,18 @@ h2 {
 }
 
 .plates input {
+    /* this CSS hides the checkbox */
   display: none;
 }
 
 .plates input + label:before {
+  /* this CSS changes the checkbox to a blank gray square */
   content: "⬜️";
   margin-right: 10px;
 }
 
 .plates input:checked + label:before {
+    /* this CSS changes the gray square to a taco with the input is checked */
   content: "🌮";
 }
 
