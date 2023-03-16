@@ -1,3 +1,4 @@
+<!-- learn about window events and debouncing (which makes sure that it's not hammering on scroll)-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,6 +45,13 @@
   </div>
 
   <script>
+    // select all the images I will be listening for (they've been translated offscreen and 0 opacity) 
+    // when they half slide into view, apply a class called active which brings the opacity to 1 and
+    // translates the x to 0 and sclae back from 0.95 to 1
+
+    // there's a debounce in low -... this is a debounce function off the internet
+    // pass debounce a function, and it will run debounce all the time when I scroll, but it will actually only run the 
+    // functin check slide once every 20 or 100 milliseconds
     function debounce(func, wait = 20, immediate = true) {
       var timeout;
       return function() {
@@ -58,6 +66,56 @@
         if (callNow) func.apply(context, args);
       };
     }
+
+    const sliderImages = document.querySelectorAll('.slide-in');
+
+    // checkSlide function will run every time user scrolls
+    // e being scroll
+    // this function need debouncing
+    // DEBOUNCE - function will have a max number of seconds it will be run
+    function checkSlide(e) {
+      // checkSlide is getting run too much
+      // console.count(e);
+
+      // console.log(window.scrollY);
+
+      // need to loop over every single image and figure out where the image needs to be shown
+      // once the image is peeking, the image should be on the page at least 50% of its height then animate it on in
+      sliderImages.forEach(sliderImage => {
+        
+        // figure out how far the page is being scrolled down: window.scrollY
+        // window.scrollY is how much I am scrolled down at the very top of my browser
+        // I want to know where I am on the very bottom of my viewport
+
+        // this is recalculated every time because something might change on the page
+        const slideInAt = (window.scrollY + window.innerHeight) - sliderImage.height / 2;
+        // console.log(slideInAt);
+      
+        // I want the image to slide in halfway into the space for it
+
+        // I need to know where the bottom of the image is, because I want to know if I scroll past the image,
+        // then the image should slide itself back out
+        // to get the same effect if I scroll from the back up
+        // offsetTop is the how far the image's top is from the top of the window
+        const imageBottom = sliderImage.offsetTop + sliderImage.height;
+        const isHalfShown = slideInAt > sliderImage.offsetTop;
+        const isNotScrolledPast = window.scrollY < imageBottom; 
+
+        if (isHalfShown && isNotScrolledPast) {
+          sliderImage.classList.add('active');
+        } else {
+          sliderImage.classList.remove('active');
+        }
+
+        // figure out if the image is half shown, and if it's not, then I haven't scrolled past the image yet
+
+
+      })
+    }
+    
+    // below may become a performance issue...
+    // anytime I want to do something on scroll, I want to think about debounce
+    window.addEventListener('scroll', debounce(checkSlide));
 
   </script>
 

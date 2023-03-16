@@ -1,3 +1,5 @@
+<!-- user inputs a key sequence and that triggers something -->
+<!-- ex. konami code for unlimited lives in mario -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +10,27 @@
 </head>
 <body>
 <script>
+  // get up a key sequencing detection, store them in an array, and check every time they keyup if it matches what I am looking for
+  const pressed = [];
+  const secretCode = 'wesbos';
+  // listens for a key press, and logs which key it was
+  window.addEventListener('keyup', (e) => {
+    console.log(e.key);
+    pressed.push(e.key);
+    // start splice counting from the back, 7 letters, and then trim from there
+    pressed.splice(-secretCode.length - 1, pressed.length - secretCode.length);
+
+    // turns the array into a string
+    if (pressed.join('').includes(secretCode)) {
+      console.log('DING DING!');
+      cornify_add();
+    }
+    console.log(pressed);
+
+    // need to trim the array to be the maximum I would ever need
+  })
+
+  // whenever a key is pressed, push that key into an array
 </script>
 </body>
 </html>

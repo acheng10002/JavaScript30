@@ -1,3 +1,5 @@
+<!-- check one item, hold down the shift key, check a lower item, everything inbetween should also be set to checked -->
+<!-- should work top to bottom and bottom to top -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,6 +62,7 @@
   <div class="inbox">
     <div class="item">
       <input type="checkbox">
+      <!-- a label for input would be more appropriate -->
       <p>This is an inbox layout.</p>
     </div>
     <div class="item">
@@ -97,6 +100,62 @@
   </div>
 
 <script>
+// need to select every one of the checkboxes and listen for when they get checked
+const checkboxes = document.querySelectorAll('.inbox input[type="checkbox"]');
+// console.log(checkboxes);
+
+// when I check my first checkbox, that one needs to be put into a variable because when I hit shift and check my next one, 
+// I need to know what the first checkbox was
+
+// use let here because lastChecked will be reassigned constantly
+let lastChecked; 
+
+function handleCheck(e) {
+  // check if the shift key was down when the checkbox was checked
+  // when I uncheck, handleCheck should also be triggered
+
+  let inBetween = false;
+  
+  // need to check if it's checking happening
+  if (e.shiftKey && this.checked) {
+    
+    // loop through every checkbox and look for the first one that was checked, find the last one that was checked
+    // check all the boxes in between
+    // don't depend on the HTML because someone could just change it
+
+    // create a boolean variable called inBetween
+    // inBetween will be false for the unchecked boxes before the first one
+    // inBetween will be true for boxes after the first checked one
+    // inBetween will be false for the last box checked, and I'm done
+    checkboxes.forEach(checkbox => {
+      console.log(checkbox);
+      // is this checkbox the same as the one being looped through (going from bottom to top) OR is this checkbox the last one checked
+      if (checkbox === this || checkbox === lastChecked) {
+
+        // inBetween is a flag variable
+        // FLAG VARIABLE - Boolean variable that is used to control the behavior of a program or to indicate the state of a
+        // particular condition or event
+        // inBetween is initially set to false
+        // once I hit the first checked box, inBetween will be assigned true
+        inBetween = !inBetween;
+        console.log('Starting to check them in between!');
+      }
+
+      // if inBetween is assigned to true, then program the nex checkbox to be checked
+      // do this for every inBetween checkbox until the last one which is already checked
+      // then the flag variable gets set to false
+      if (inBetween) {
+        checkbox.checked = true;
+      }
+    });
+  }
+  // console.log(e);
+  lastChecked = this;
+}
+
+// listen for when one of checkboxes get clicked; listener wll fire even if click is done on keyboard
+checkboxes.forEach(checkbox => checkbox.addEventListener('click', handleCheck));
+
 </script>
 </body>
 </html>
