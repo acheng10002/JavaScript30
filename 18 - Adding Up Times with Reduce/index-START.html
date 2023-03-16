@@ -1,3 +1,8 @@
+<!-- add up total number of hours, minutes, and seconds that are my videos 
+     with youtube, there's a data-time attribute with a string that has minutes and seconds 
+     how do I pull the data-time attributes out of the DOM, convert them to numbers, 
+     make them into minutes and seconds, add them all up, and them console.log the values 
+     can be done with map and reduce or reduce alone -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,6 +188,59 @@
     </li>
   </ul>
 <script>
+  // I don't want to just select the list items, I want to select 
+  // everything with the data-time attribute on it
+  const timeNodes = Array.from(document.querySelectorAll('[data-time]'));
+
+  // I get a node list that I want to turn into an array of time strings
+  //  console.log(timeNodes);
+
+  // I can't do the below, because timeNodes is a node list, not an array
+  
+  // so instead, I took timeNodes, a node list, turned it into an array, and mapped it
+  // turning from an array of list items to an array of strings 
+  const seconds = timeNodes
+    .map(node => node.dataset.time)
+
+      // now I want to turn it into just seconds
+    .map(timeCode => {
+      // I want to change the string into minutes and seconds
+      // using es6 templates below
+      const [mins, secs] = timeCode.split(':').map(parseFloat);
+      
+      return (mins * 60) + secs; 
+
+      // map took in an array and returns an array...
+      // reduce takes in an array and returns...anything I want!
+      
+      console.log(mins, secs);
+      // numbers are appearing in black, which means they're strings because 
+      // after splitting the strings, the parts are still strings
+    })
+
+      .reduce((total, vidSeconds) => total + vidSeconds);
+
+    // variable that serves as a running tally of how many seconds are left
+    let secondsLeft = seconds;
+
+    // just want the lower limit of hours
+    const hours = Math.floor(secondsLeft / 3600);
+    
+    secondsLeft = secondsLeft % 3600;
+
+    const mins = Math.floor(secondsLeft / 60);
+
+    secondsLeft = secondsLeft % 60;
+
+    console.log(hours, mins, secondsLeft);
+
+
+  // I have a .forEach(), but it is not as clean
+  // to turn it into an array, I could:
+  // 1. spread it into a new array
+  // 2. run Array.from()
+
+
 </script>
 </body>
 </html>

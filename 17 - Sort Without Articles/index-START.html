@@ -1,3 +1,4 @@
+<!-- sort without articles because articles don't count toward alphabetization -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,6 +50,45 @@
 <script>
 const bands = ['The Plot in You', 'The Devil Wears Prada', 'Pierce the Veil', 'Norma Jean', 'The Bled', 'Say Anything', 'The Midway State', 'We Came as Romans', 'Counterparts', 'Oh, Sleeper', 'A Skylit Drive', 'Anywhere But Here', 'An Old Dog'];
 
+// ^ means when it starts with
+// trim() gets rid of trailing spaces
+function strip(bandName) {
+  return bandName.replace(/^(a |the |an )/i, '').trim();
+}
+
+
+// sort method takes a function name with arguments a and b 
+// the one that comes earlier in the alphabet gets moved to the top, 
+// the one that comes later in the alphabet gets moved to the bottom
+// toss the one that comes later, and get another one
+const sortedBands = bands.sort((a, b) => strip(a) > strip(b) ? 1 : -1);
+
+  // strip gets used in the if statement instead of modifying the data
+  // the data that I'm using to alphabetize is not the same as the data in the array
+  // if (strip(a) > strip(b)) {
+  //   return 1;
+  // } else {
+  //   return -1;
+  // }
+
+// if the only thing I'm doing in a function is returning something, I can use implicit return
+
+// .forEach() iterates over an array and performs an operation on each item in the array; 
+// .forEach() does not return a new array, but instead modifies the original array
+// .map() creates a new array based on the result of applying a function to each item in the original array
+// .map() does not modify the original array, but instead returns a new array with the same length as the original array
+
+// takes the element with id bands, sets the innerHTML to be sortedBands
+document.querySelector('#bands').innerHTML = 
+  sortedBands
+  // map over each band in the sortedBands, and that will return an array, so join it 
+  .map(band => `<li>${band}</li>`)
+  // without join, commas would show up
+  // if I try to call innerHTML on an array, it will call toString on it and include commas
+  // join will put the array items into one big string rather than a collection of several strings
+  .join('');
+
+console.log(sortedBands);
 
 </script>
 
