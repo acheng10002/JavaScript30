@@ -1,3 +1,4 @@
+<!-- do speech recognition without libraries or external APIs; instead do it straight in the browser -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +12,60 @@
   </div>
 
 <script>
+  // SpeechReognition is a global variable that lives in the browser on the window
   window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  // create a new instance of speech recognition
+  const recognition = new SpeechRecognition();
+
+  // as I am speaking, the browser's window will populate
+  recognition.interimResults = true;
+
+  // create a paragraph, and as I speak, update the last paragraph
+  // when I stop speaking, a new paragraph get created
+  let p = document.createElement('p');
+
+  const words = document.querySelector('.words');
+
+  // take the div with class words and append the p I just created
+  // putting it in the DOM as I work with it
+  words.appendChild(p);
+
+  // it's like listening for clicks but instead listening for a result
+  recognition.addEventListener('result', e=> {
+    // console.log(e.results);
+
+    // convert the nested data into an array first, then map over each item, and do the conversion
+    const transcript = Array.from(e.results)
+      .map(result => result[0])
+      .map(result => result.transcript)
+      // put together pieces
+      .join('')
+
+      // when I stop speaking, it stops working because the result is finished
+        p.textContent = transcript;
+
+        // issue here tho is, when I stop talking and start to talk again, a new p overwrites the last p
+        // so check if the result is final
+        if (e.results[0].isFinal) {
+          p = document.createElement('p');
+          words.appendChild(p); 
+        }
+
+      console.log(transcript);
+  });
+
+  // results is a list, not an array
+  // in the prototype, there is no map or forEach()
+  // convert the list to an array
+  // or use es6 forOf to iterate
+  // nested into the results list, it tells me what the person said as well as its confidence
+  // isFinal boolean, is the person done speaking
+  // I need to take the mess of nested data and convert it into a string that I can see
+
+  // add a second event listener to listen for the end event and then run recognition.start
+  recognition.addEventListener('end', recognition.start);
+  recognition.start();
 
 </script>
 
