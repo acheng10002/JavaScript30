@@ -1,3 +1,4 @@
+<!-- using the browser's Speech Synthesis API to create a voiceinator app -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,29 +14,129 @@
 
       <h1>The Voiceinator 5000</h1>
 
+      <!-- select contains a list of all of my possible voices -->
       <select name="voice" id="voices">
         <option value="">Select A Voice</option>
       </select>
 
+      <!-- input rate just changes how fast the speaking voice is -->
       <label for="rate">Rate:</label>
       <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
 
+      <!-- input for pitch -->
       <label for="pitch">Pitch:</label>
-
       <input name="pitch" type="range" min="0" max="2" step="0.1">
+
+      <!-- textarea for whatever I want the voice to say -->
       <textarea name="text">Hello! I love JavaScript 👍</textarea>
+
+      <!-- stop and speak buttons -->
       <button id="stop">Stop!</button>
       <button id="speak">Speak</button>
+
+      <!-- the names of rate, pitch, and text line up with the property on the utterance -->
 
     </div>
 
 <script>
+  // on the function call, SpeechSynthesisUtterance, utterance will have info on rate, pitch, 
+  // the choice of voice, and what the voice will be saying
+
+  // new is an operator that creates an instance of a user defined object type 
+  // or of a built-in object type that has a constructor function
   const msg = new SpeechSynthesisUtterance();
+
+  // empty array where voices will be dumped
   let voices = [];
   const voicesDropdown = document.querySelector('[name="voice"]');
+
+  // options include voice choice, rate, pitch, and textarea
   const options = document.querySelectorAll('[type="range"], [name="text"]');
+  
   const speakButton = document.querySelector('#speak');
   const stopButton = document.querySelector('#stop');
+
+  // whatever is on page load will be default
+  msg.text = document.querySelector('[name="text"]').value;
+
+  // populate the voices; take a global variable (SpeechSynthesisUtterance is already one global variable)...
+  // other global variable is SpeechSynthesis, I can call speak on SpeechSynthesis and pass speak an utterance/msg
+
+  function populateVoices() {
+    voices = this.getVoices();
+    // console.log(voices);
+    // each voice has a name property and a lang property
+    // I need to loop over all the speech voices and set them as options in the dropdown
+
+    const voiceOptions = voices
+
+      // filter for only English voices
+      .filter(voice => voice.lang.includes('en'))
+
+      .map(voice => `<option value="${voice.name}">${voice.name}(${voice.lang})</option>`)
+      .join('');
+      voicesDropdown.innerHTML = voiceOptions;
+      // above, as soon as voices load I get a huge dropdown 
+  }
+
+  // populateVoices cannot be called on page load because when speechSynthesis loads, choiceschanged needs to fire
+
+  // I have an utterance, and a speechSynthesis
+  // speechSynthesis will take the utterance and talk it out
+
+  // call setVoice when selection is changed on the dropdown
+  function setVoice() {
+    console.log('Changing voice');
+
+    // I need to find the voice that lines up with the value selected from the dropdown
+    // console.log(this.value);
+
+    // I need to find the name of the voice, and the voice's corresponding SpeechSynthesisVoice object
+
+    // loops over every single voice in the array, and will find the one with the same name attribute as the option selected
+    msg.voice = voices.find(voice => voice.name === this.value);
+    toggle(); 
+  }
+
+  // when voice selection is changed, restart
+  function toggle(startOver =true) {
+    speechSynthesis.cancel();
+
+    // toggle(false) will stop it and toggle(0 itself will restart it)
+    if (startOver) {
+      speechSynthesis.speak(msg);
+    }
+  }
+
+  function setOption() {
+    // whenever any of the three options change, I know the name of the option/property and what it was changed to
+    console.log(this.name, this.value);
+
+    // takes care of options, voice, rate, pitch, text
+    msg[this.name] = this.value;
+
+    toggle();
+  }
+
+  speechSynthesis.addEventListener('voiceschanged', populateVoices);
+  voicesDropdown.addEventListener('change', setVoice);
+
+  options.forEach(option => option.addEventListener('change', setOption));
+
+  speakButton.addEventListener('click', toggle);
+
+  stopButton.addEventListener('click', function() {
+    toggle(false);
+  });
+  
+  // bind gets passed null and toggle's first argument which is false
+  // this is what bind does to functions
+  // or toggle.bind(null, false));
+  // or => toggle(false);
+  // 
+
+
+
 </script>
 
 </body>

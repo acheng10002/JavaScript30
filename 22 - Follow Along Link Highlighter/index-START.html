@@ -1,3 +1,9 @@
+<!-- drop-down menus, hide one and show the other 
+    I cannot just transition the background from one menu to the other, bc it's 2 different elements
+    anything with a link, a pill will hightlight
+    the pill resizes and follows my cursor -->
+
+  <!-- getBoundingClientRect and applying it the the inline styles -->  
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +33,68 @@
     </div>
 
   <script>
-    // 👀👀👀👀👀👀👀👀👀👀👀👀👀👀👀
+    // need to first get all the triggers
+    // triggers are things that will be hovered over that need a background behind it
+    // selects all links on the page
+    const triggers = document.querySelectorAll('a');
+
+    // I need to highlight
+    // in the DOM, the highlight is a span
+    // which I hover or something, the highlight figures out the width, height, 
+    // and where on the page the highlighted item is (the transform, translateX and translateY values)
+    // there are CSS transitions on the highlight span element
+
+    // create the highlighting span element 
+    const highlight = document.createElement('span');
+
+    // give it a class of highlight
+    highlight.classList.add('highlight');
+
+    // add it to the DOM
+    document.body.append(highlight);
+
+    // now listen for hovering over a link
+
+    function highlightLink() {
+      // console.log('Highlight!!');
+
+      // if I console.log(this), I will see in the console the logging of actual links the mousenter has occurred over
+
+      // this is the thing that was triggered, hovering over each of the links
+      const linkCoords = this.getBoundingClientRect();
+      
+      // console.log(linkCoords);
+
+      const coords = {
+        width: linkCoords.width,
+        height: linkCoords.height,
+        top: linkCoords.top + window.scrollY,
+        left: linkCoords.left + window.scrollX
+      }
+
+      // with getBoundingClientRect(), I get the Client Rect which gives me:
+      // bottom, top, left, right, height, and width
+      // Client Rect gives me all the info about where on the page the link lives
+      // below dynamically applies the style to the highlight
+      highlight.style.width = `${coords.width}px`;
+      highlight.style.height = `${coords.height}px`;
+
+      // won't use CSS left and right to move the highlighter span, instead going to use CSS transform for smoother animation
+      // highlight.style.transform = `translate(100px, 100px)`;
+      highlight.style.transform = `translate(${coords.left}px, ${coords.top}px)`;
+    }
+
+    // listen for a mouse enter event on each of my triggers
+    triggers.forEach(a => a.addEventListener('mouseenter', highlightLink));
+
+    // now I need to figure out the width, height, X, and Y- need to know how big is the element that I hovered over
+    // and where on the page is that element... using a method called getBoundingClientRect
+
+    // up until now, it will be off if I scroll down at all
+    // I can fix this in two ways:
+    // 1. figure out the offset of the parent
+    // 2. take how far down the scrolling is and take that distance away from the highlighter span
+
   </script>
 </body>
 </html>

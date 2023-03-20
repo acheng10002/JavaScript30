@@ -1,3 +1,6 @@
+<!-- not just getting longitude & latitude, PLUS heading 
+     which is how many degrees from north AND speed
+    I can fake coordinates in Chrome, but I cannot fake heading or speed -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,6 +63,32 @@
     /*Compass: https://thenounproject.com/search/?q=compass&i=592352*/
   </style>
   <script>
+    // local host is a secure origin
+    // but I want to open up the website on a different device, so it will give me an internal IP address
+    // self-signed certificate - digital certificate that is signed by its creator rather than a third-party certicate authority
+    // self-signed certificates are used in small-scale deployments when the cost and complexity of getting a trusted certificate from a CA is not justified
+    // self-signed certificate allows me to have https on my computer
+
+    // need to select the compass's arrow and the speed
+    const arrow = document.querySelector('.arrow');
+    const speed = document.querySelector('.speed-value');
+
+    // need to listen for the user's position
+    // there is watchPosition and getCurrentLocation, and I want watchPosition
+    // getCurrentPosition would just get me the arrow, and watchPosition will watch over time
+    // watchPosition will give me more updates if the user is moving around a lot 
+    // and fewer updates if the person isn't moving around as much
+    navigator.geolocation.watchPosition((data) => {
+      console.log(data);
+      speed.textContent = data.coords.speed;
+
+      arrow.style.transform = `rotate(${data.coords.heading}deg)`;
+
+      // above is the success callback - when a user gives me access to their location, it will run
+    }, (err) => {
+      console.err(err);
+      alert('HEY! YOU GOTTA ALLOW THAT TO HAPPEN!!!');
+    });
   </script>
 </body>
 </html>

@@ -33,6 +33,7 @@ a {
 }
 
 .highlight {
+  /* transition time is how long the change takes */
   transition: all 0.2s;
   border-bottom: 2px solid white;
   position: absolute;
