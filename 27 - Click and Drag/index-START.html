@@ -1,3 +1,6 @@
+<!-- horizontally scrolling div that works with JS 
+     cursor can also be used to click and drag 
+     involves mouseevent and mousepositioning -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,6 +39,86 @@
   </div>
 
 <script>
+  // I want to select items, the white box outlining stuff to be dragged and scrolled
+  // listening for click down on stuff to drag and scroll, and add class of active
+  // then figure out where the click down happened
+  // anchor down as soon as I click, and depending on how far each way I scroll, that distance is how much I will move the div
+  // when I move the mouse to either the left or right, figure out
+  // ex. I click at 500px, if I scroll my mouse to the left 20px, the div should scroll to the left 20px
+
+  // combo of mousedown, mouse leave, mouseout, up, and mousemove
+
+  const slider = document.querySelector('.items');
+
+  // FLAG VARIABLE - boolean variable that acts as a signal to indicate a certain condition or state in the program
+  // flag variables are used to control the flow of the program and make decisions based on the value of the flag
+  // isDown is my flag variable, false when I'm not clicking, true when I am clicking
+  let isDown = false;
+
+  // values will be assigned to these variables in my events
+  // startX is where someone first clicks down before they start moving
+  let startX;
+  let scrollLeft;
+
+  slider.addEventListener('mousedown', (e) => {
+    isDown = true;
+    // when class is active, CSS for items changes, background, cursor, and transform scale to go up to 1 from 0.98
+    slider.classList.add('active');
+
+    // event is the mousevent
+    // e.pageX is one way of figuring out where on the page the mousedown is
+    // BUT if the was a margin on the page, then the pageX would be off
+    // I need to know where the click happened inside of the div, not on the page
+    // console.log(e.pageX);
+
+    // have pageX track with the offsetLeft 
+    startX = e.pageX - slider.offsetLeft;
+    // console.log(startX);
+
+    // scrollLeft is a JS method that lets me get or set the horizontal scroll position
+    scrollLeft = slider.scrollLeft; 
+
+    // other thing I have to log at the time of click is the scroll, figure out where the initial scroll is and scroll it from there
+
+    // NEED TO CAPTURE THE VARIABLES AT THE TIME OF MOUSEDOWN AND THEN REFERENCE THEM WHENEVER SOMEONE MOVES THE MOUSE
+  });
+  slider.addEventListener('mouseleave', () => {
+    isDown = false;
+    slider.classList.remove('active');
+  });
+  slider.addEventListener('mouseup', () => {
+    isDown = false;
+    slider.classList.remove('active');
+  });
+  slider.addEventListener('mousemove', (e) => {
+
+    // if the mouse is not down
+    if (!isDown) return;
+
+    // below only happens if isDown = true 
+    // console.count(isDown);
+    // console.log('Do work!');
+
+    // startX should remain the same no matter where I move the cursor
+    // console.log(startX);
+
+    e.preventDefault();
+
+    // recalculate starting position of mouseclick every time I move the mouse
+    const x = e.pageX - slider.offsetLeft;
+    // console.log(x, startX);
+
+    // tells me how much we moved from the starting position to the end position of the scroll
+    const walk = x - startX;
+    // console.log(walk);
+    // for more of a walk/scroll: const walk = (x - startX) * 3;
+
+    // scroll the div left or right using the scroll left property
+    slider.scrollLeft = scrollLeft - walk;
+  });
+
+
+
 </script>
 
   </body>
