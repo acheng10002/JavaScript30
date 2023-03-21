@@ -1,3 +1,10 @@
+<!-- background of the dropdown seems to be able to transform itself 
+     from the width, height, and its x- and y-coordinates
+     the dropdowns themselves are separate elements, but there's a div
+     that follows each dropdown element, and the dic will resize itself
+     based on wherever it is on the page
+     the div is absolutely positioned behind the dropdown elements
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,12 +15,17 @@
 <body>
   <h2>Cool</h2>
   <nav class="top">
+    <!-- this is the white div following the dropdown elements from left to right -->
     <div class="dropdownBackground">
+      <!-- span is the notch on top of the div -->
       <span class="arrow"></span>
     </div>
-
+    <!-- all the li's under the ul will be triggers -->
     <ul class="cool">
+      <!-- these top level li's will be my triggers -->
+      <!-- things will be hovered over these triggers -->
       <li>
+        <!-- cannot hover over the a link because I won't be able to access things listed under the a link -->
         <a href="#">About Me</a>
         <div class="dropdown dropdown1">
           <div class="bio">
@@ -147,6 +159,7 @@
     display: block;
   }
 
+  /* opacity is separate so that there is a transition instead of immediate display */
   .trigger-enter-active .dropdown {
     opacity: 1;
   }
@@ -165,6 +178,7 @@
     opacity:0;
   }
 
+  /* when background has a class of open, show the white div background */
   .dropdownBackground.open {
     opacity: 1;
   }
@@ -221,6 +235,69 @@
 </style>
 
 <script>
+  const triggers = document.querySelectorAll('.cool > li');
+
+  // below is the white div
+  // using querySelector for just one element and not to get a nodelist
+  const background = document.querySelector('.dropdownBackground');
+
+  const nav = document.querySelector('.top');
+
+  // listen for a hover in and out or a mouse enter or mouse leave on each of the list items
+  function handleEnter() {
+
+    // console.log('ENTER!');
+    this.classList.add('trigger-enter');
+
+    // value of this will be inherited from the parent function
+    setTimeout(() => this.classList.contains('trigger-enter') && this.classList.add('trigger-enter-active'), 150); 
+    
+    // console.log(this);
+
+    // need to get the white div on the page
+    background.classList.add('open');
+
+    const dropdown = this.querySelector('.dropdown');
+    // console.log(dropdown);
+    
+    // I get a different dropdown in the console when I hover over each li
+    const dropdownCoords = dropdown.getBoundingClientRect();
+
+    // I get info, the bottom, height, left, right, and width of the li
+    // console.log(dropdownCoords);
+
+    // I need coordinates for the nav as well, bc the ClientRect or DOMRect info is relative to the space the nav takes up
+    const navCoords = nav.getBoundingClientRect();
+    // console.log(navCoords);
+
+    const coords = {
+      height: dropdownCoords.height,
+      width: dropdownCoords.width,
+      top: dropdownCoords.top - navCoords.top,
+      left: dropdownCoords.left - navCoords.left,
+    };
+
+    background.style.setProperty('width', `${coords.width}px`);
+    background.style.setProperty('height', `${coords.height}px`);
+    background.style.setProperty('transform', `translate(${coords.left}px, ${coords.top}px)`);
+  
+  }
+
+
+  function handleLeave() {
+    this.classList.remove('trigger-enter', 'trigger-enter-active');
+
+    background.classList.remove('open');
+  }
+
+  triggers.forEach(trigger => trigger.addEventListener('mouseenter', handleEnter));
+  triggers.forEach(trigger => trigger.addEventListener('mouseleave', handleLeave));
+
+  // 1. I want to get the contents of the dropdown showing when I hover over the li (again not the a)
+  // doing that adding and removing classes
+
+  // 2. how high, how wide, and in what position is each li
+
 </script>
 
 </body>

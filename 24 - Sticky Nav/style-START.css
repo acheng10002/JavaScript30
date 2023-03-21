@@ -25,6 +25,11 @@ body {
   transition: transform 0.5s;
 }
 
+.fixed-nav .site-wrap {
+  /* makes main content slightly bigger */
+  transform: scale(1);
+}
+
 header {
   text-align: center;
   height: 50vh;
@@ -42,12 +47,26 @@ h1 {
 }
 
 nav {
+  /* this CSS is not great, should have a class */
   background: black;
   top: 0;
   width: 100%;
   transition: all 0.5s;
   position: relative;
   z-index: 1;
+}
+
+/* when the body has a class of fixed-nav, the nav itself */
+.fixed-nav nav {
+  position: fixed;
+  /* when the nav bar is in the fixed state, have a shadow showing that I have some depth there */
+  box-shadow: 0 5px rgba(0, 0, 0, 0.1);
+
+  /* issue is the content starts to jump up */
+  /* happens because when I make the nav fixed, it no longer takes up space in the document */ 
+  /* fixed element sort of floats on top of the browser, and this causes a reflow on a page */ 
+  /* so then the site wrap class div below goes ahead and takes up the space the nav took up */
+  /* to offet this, I need to apply padding to the body */
 }
 
 nav ul {
@@ -66,12 +85,21 @@ nav li {
 }
 
 li.logo {
+  /* not being shown at all because it as a width of 0 */ 
   max-width: 0;
   overflow: hidden;
   background: white;
+  /* transition, animating itself in and out when scrolling down or up respectively */
   transition: all .5s;
   font-weight: 600;
   font-size: 30px;
+}
+
+.fixed-nav li.logo {
+  /* this max-width would be bigger than it could ever be */
+  /* this causes the "LOST" logo to pop out when I scroll down */
+  /* max-width cannot be auto, because transitions cannot happen from 0 to auto */
+  max-width: 500px;
 }
 
 li.logo a {
