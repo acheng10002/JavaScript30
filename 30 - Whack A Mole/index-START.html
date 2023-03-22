@@ -1,3 +1,5 @@
+<!-- game itself will be 10 seconds long
+    which hole the mole pops up from and for long his head is up, will be random (bt 200 ms ans 2 s) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,6 +39,79 @@
   const holes = document.querySelectorAll('.hole');
   const scoreBoard = document.querySelector('.score');
   const moles = document.querySelectorAll('.mole');
+  let lastHole;
+  let timeUp = false;
+  let score = 0;
+
+  // need a function that gives a random amount of time between a minimum and maximum
+  function randomTime(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
+
+  //another function that will pick a random hole for the mole to pop out from
+  // holes could be any list of DOM elements
+  // randomHole is a "get me a random DOM element" function
+
+  // this function is now recursive
+  function randomHole(holes) {
+    
+    // holes is a nodelist that contains all 6 holes
+    // console.log(holes);
+
+    const idx = Math.floor(Math.random() * holes.length);
+    const hole = holes[idx];
+    // console.log(hole);
+
+    if (hole === lastHole) {
+      // console.log("Nope, that's the same one.");
+
+      return randomHole(holes);
+    }
+    // lastHole saves the reference to called last
+    lastHole = hole;
+
+    return hole;
+  }
+
+  function peep() {
+    const time = randomTime(200, 1000);
+    const hole = randomHole(holes);
+
+    // get a random time for peep time and a hole for the mole to peep up from 
+    // console.log(time, hole);
+
+    hole.classList.add('up');
+
+    // the moles need to go back down when the random time is up
+    // when the time is up, 
+    setTimeout(() => {
+      hole.classList.remove('up');
+      if (!timeUp) peep();
+    }, time);
+  }
+
+  function startGame() {
+    scoreBoard.textContent = 0;
+    timeUp = false;
+    score = 0;
+    peep();
+
+    // after 10 seconds, I want timeUp = true
+    setTimeout(() => timeUp = true, 10000)
+  }
+
+  function bonk(e) {
+    // prevents fake clicks
+    if (!e.isTrusted) return;
+    score++;
+    // console.log(e);
+
+    // if mole is clicked, mole need to go back under
+    this.classList.remove('up');
+    scoreBoard.textContent = score;
+  }
+
+  moles.forEach(mole => mole.addEventListener('click', bonk));
 
 </script>
 </body>
